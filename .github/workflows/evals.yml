@@ -22,9 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      HF_HOME: ${{ runner.temp }}/hf-cache
-      MPLCONFIGDIR: ${{ runner.temp }}/mpl-config
-      XDG_CACHE_HOME: ${{ runner.temp }}/xdg-cache
 
     steps:
       - name: Checkout repository
@@ -35,9 +32,15 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Configure cache directories
+        run: |
+          echo "HF_HOME=$RUNNER_TEMP/hf-cache" >> "$GITHUB_ENV"
+          echo "MPLCONFIGDIR=$RUNNER_TEMP/mpl-config" >> "$GITHUB_ENV"
+          echo "XDG_CACHE_HOME=$RUNNER_TEMP/xdg-cache" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/hf-cache" "$RUNNER_TEMP/mpl-config" "$RUNNER_TEMP/xdg-cache"
+
       - name: Install dependencies
         run: |
-          mkdir -p "$HF_HOME" "$MPLCONFIGDIR" "$XDG_CACHE_HOME"
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           # Lightweight dev tools for evaluation metrics
