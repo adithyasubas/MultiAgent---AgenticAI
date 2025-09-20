@@ -1,0 +1,9 @@
+Welcome everyone to the quarterly AI marketing lab. Today we're walking through how we used generative models to increase qualified leads by 27 percent this spring. I'll start with the architecture: we ingest CRM win/loss notes, anonymized chat transcripts, and campaign performance data into a feature store. A lightweight retrieval layer feeds our prompt templates so the model always references fresh customer language.
+
+Phase one focused on enablement. We built a playbook generator that outputs discovery questions and objection handles tuned to vertical and persona. Reps triggered the tool from Salesforce; adoption hit 82 percent in the first month and time-to-send for follow-up emails dropped from two days to six hours on average.
+
+Phase two addressed content scale. We trained an evaluation harness that scores headlines for clarity, differentiation, and compliance before a human sees them. That allowed us to ship twice as many campaign variants without increasing review cycles. Important note: we kept a human in the loop for final approval, and every piece is watermarked so legal can audit usage.
+
+Finally, measurement. We ran an A/B test on webinar promotions across three industries. The AI-assisted assets lifted click-through by 41 percent in manufacturing, 19 percent in healthcare, and 8 percent in fintech where the baseline was already strong. When questions came up about hallucination risk, we pointed to the guardrails: retrieval grounding, evaluation gating, and human sign-off within four hours of send.
+
+If you're considering a similar rollout, start with a narrow use case, invest in clean knowledge bases, and measure latency so reps trust the tool. We'll share the governance checklist and prompt library in the follow-up email. Drop questions in chat and we'll tackle them during Q&A.

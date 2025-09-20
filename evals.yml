@@ -1,0 +1,75 @@
+name: Evaluation Suite
+
+on:
+  push:
+    branches: ["main", "master"]
+    paths:
+      - "app.py"
+      - "utils/**"
+      - "evals/**"
+      - "requirements.txt"
+      - ".github/workflows/evals.yml"
+  pull_request:
+    branches: ["main", "master"]
+    paths:
+      - "app.py"
+      - "utils/**"
+      - "evals/**"
+      - "requirements.txt"
+
+jobs:
+  run-evals:
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      HF_HOME: ${{ runner.temp }}/hf-cache
+      MPLCONFIGDIR: ${{ runner.temp }}/mpl-config
+      XDG_CACHE_HOME: ${{ runner.temp }}/xdg-cache
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          mkdir -p "$HF_HOME" "$MPLCONFIGDIR" "$XDG_CACHE_HOME"
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # Lightweight dev tools for evaluation metrics
+          pip install rouge-score bert-score
+
+      - name: Prime Hugging Face cache
+        run: |
+          python - <<'PY'
+from transformers import AutoTokenizer, AutoModel
+model_name = "roberta-large"
+AutoTokenizer.from_pretrained(model_name)
+AutoModel.from_pretrained(model_name)
+PY
+
+      - name: Run evaluation suite (mock mode)
+        run: |
+          python evals/run_evals.py --mode mock
+
+      - name: Upload evaluation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: evals/results/
+
+      - name: Optional live evaluation
+        if: env.OPENAI_API_KEY != ''
+        run: |
+          python evals/run_evals.py --mode live --output-dir evals/results/live
+
+      - name: Upload live evaluation report
+        if: env.OPENAI_API_KEY != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report-live
+          path: evals/results/live/
